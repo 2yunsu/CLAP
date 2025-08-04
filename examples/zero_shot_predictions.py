@@ -12,7 +12,7 @@ ground_truth = ['coughing']
 prompt = 'this is a sound of '
 class_prompts = [prompt + x for x in classes]
 #Load audio files
-audio_files = ['audio_file']
+audio_files = ['/home/CLAP/examples/root_path/vgg-foley-sound/audio/__0Fp4K-2Ew.wav']
 
 # Load and initialize CLAP
 # Setting use_cuda = True will load the model on a GPU using CUDA

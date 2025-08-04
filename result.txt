@@ -1,0 +1,12 @@
+random_seed = 0
+Valid count: 33121
+
+prompt: 'this is the sound of {}'
+Predicted_material: Accuracy 0.08580658796533921
+label: Accuracy 0.6307478638929984
+CLAP_prediction: 0.6564113402373116
+Combined_label: 0.781256604571118
+
+prompt: "This is Foley-sound recorded by, {}"
+Predicted_material: ESC50 Accuracy 0.03318136529694152
+label: ESC50 Accuracy 0.6496180670873464

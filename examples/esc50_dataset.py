@@ -5,9 +5,19 @@ import pandas as pd
 import os
 import torch.nn as nn
 import torch
+import random
+import numpy as np
+
+#random seed
+random_seed = 0
+torch.manual_seed(random_seed)  # torch
+torch.cuda.manual_seed(random_seed)
+torch.cuda.manual_seed_all(random_seed)  # if use multi-GPU
+np.random.seed(random_seed)  # numpy
+random.seed(random_seed)  # random
 
 class AudioDataset(Dataset):
-    def __init__(self, root: str, download: bool = True):
+    def __init__(self, root: str, download: bool = False):
         self.root = os.path.expanduser(root)
         if download:
             self.download()
@@ -23,15 +33,15 @@ class AudioDataset(Dataset):
 
 
 class ESC50(AudioDataset):
-    base_folder = 'ESC-50-master'
+    base_folder = 'vgg-foley-sound'
     url = "https://github.com/karoldvl/ESC-50/archive/master.zip"
     filename = "ESC-50-master.zip"
     num_files_in_dir = 2000
     audio_dir = 'audio'
-    label_col = 'category'
-    file_col = 'filename'
+    label_col = 'Combined_label'
+    file_col = 'YouTube_ID'
     meta = {
-        'filename': os.path.join('meta','esc50.csv'),
+        'filename': os.path.join('meta','VGG-Foley-Sound_CLAP_combined_delete_None.csv'),
     }
 
     def __init__(self, root, reading_transformations: nn.Module = None, download: bool = True):
@@ -42,7 +52,7 @@ class ESC50(AudioDataset):
         self.pre_transformations = reading_transformations
         print("Loading audio files")
         # self.df['filename'] = os.path.join(self.root, self.base_folder, self.audio_dir) + os.sep + self.df['filename']
-        self.df['category'] = self.df['category'].str.replace('_',' ')
+        self.df['Combined_label'] = self.df['Combined_label'].str.replace('_',' ')
 
         for _, row in tqdm(self.df.iterrows()):
             file_path = os.path.join(self.root, self.base_folder, self.audio_dir, row[self.file_col])

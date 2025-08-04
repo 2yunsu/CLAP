@@ -12,26 +12,37 @@ from sklearn.metrics import accuracy_score
 
 # Load dataset
 root_path = "root_path" # Folder with ESC-50-master/
-dataset = ESC50(root=root_path, download=True) #If download=False code assumes base_folder='ESC-50-master' in esc50_dataset.py
+dataset = ESC50(root=root_path, download=False) #If download=False code assumes base_folder='ESC-50-master' in esc50_dataset.py
 prompt = 'this is the sound of '
 y = [prompt + x for x in dataset.classes]
 
 # Load and initialize CLAP
-clap_model = CLAP(version = '2023', use_cuda=False)
+clap_model = CLAP(version = '2023', use_cuda=True)
 
 # Computing text embeddings
 text_embeddings = clap_model.get_text_embeddings(y)
 
 # Computing audio embeddings
 y_preds, y_labels = [], []
+valid_count = 0
+fail_list = []
 for i in tqdm(range(len(dataset))):
-    x, _, one_hot_target = dataset.__getitem__(i)
-    audio_embeddings = clap_model.get_audio_embeddings([x], resample=True)
-    similarity = clap_model.compute_similarity(audio_embeddings, text_embeddings)
-    y_pred = F.softmax(similarity.detach().cpu(), dim=1).numpy()
-    y_preds.append(y_pred)
-    y_labels.append(one_hot_target.detach().cpu().numpy())
+    try:
+        x, _, one_hot_target = dataset.__getitem__(i)
+        audio_embeddings = clap_model.get_audio_embeddings([x+'.wav'], resample=True)
+        similarity = clap_model.compute_similarity(audio_embeddings, text_embeddings)
+        y_pred = F.softmax(similarity.detach().cpu(), dim=1).numpy()
+        y_preds.append(y_pred)
+        y_labels.append(one_hot_target.detach().cpu().numpy())
+        valid_count += 1
 
+    except:
+        fail_list.append([x + 'wav'])
+        continue
+    
+# print('Fail list: {}'.format(fail_list)
+
+print('Valid count: {}'.format(valid_count))
 
 y_labels, y_preds = np.concatenate(y_labels, axis=0), np.concatenate(y_preds, axis=0)
 acc = accuracy_score(np.argmax(y_labels, axis=1), np.argmax(y_preds, axis=1))

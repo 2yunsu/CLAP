@@ -354,3 +354,5 @@ dist/
 
 venv/
 root_path/
+#audio files
+/audio
